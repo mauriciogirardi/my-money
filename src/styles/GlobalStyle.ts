@@ -71,6 +71,7 @@ export const GlobalStyle = createGlobalStyle`
     bottom: 0;
     left: 0;
     right: 0;
+    padding: 0 2rem;
 
     display: flex;
     align-items: center;
