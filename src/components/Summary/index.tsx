@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import CountUp from 'react-countup';
 
+import { useTransactions } from 'hooks/TransactionsContext';
 import incomeImg from 'assets/income.svg';
 import outcomeImg from 'assets/outcome.svg';
 import totalImg from 'assets/total.svg';
@@ -7,6 +9,11 @@ import totalImg from 'assets/total.svg';
 import * as S from './styles';
 
 export function Summary() {
+  const { transactions } = useTransactions();
+  const [total, setTotal] = useState(0);
+  const [deposit, setDeposit] = useState(0);
+  const [withdraw, setWithdraw] = useState(0);
+
   return (
     <S.ContainerSummary>
       <div>
