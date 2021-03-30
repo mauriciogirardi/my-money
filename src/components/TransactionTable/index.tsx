@@ -1,22 +1,10 @@
-import { useEffect, useState } from 'react';
-import api from 'services/api';
+import formattedAmount from 'utils/formattedAmount';
+import formattedDate from 'utils/formattedDate';
+import { useTransactions } from 'hooks/TransactionsContext';
 import * as S from './styles';
 
-interface TransactionProps {
-  id: number;
-  title: string;
-  amount: number;
-  type: string;
-  category: string;
-  createdAt: Date;
-}
-
 export function TransactionTable() {
-  const [transactions, setTransactions] = useState<TransactionProps[]>([]);
-
-  useEffect(() => {
-    api.get('transactions').then(response => setTransactions(response.data));
-  }, []);
+  const { transactions } = useTransactions();
 
   return (
     <S.ContainerTable>
@@ -30,21 +18,18 @@ export function TransactionTable() {
           </tr>
         </thead>
 
-        <tbody>
-          <tr>
-            <td>Meracado</td>
-            <td className="withdraw">-R$580,00</td>
-            <td>Compra</td>
-            <td>25/03/2021</td>
-          </tr>
-
-          <tr>
-            <td>Meracado</td>
-            <td className="deposit">R$580,00</td>
-            <td>Deposito</td>
-            <td>25/03/2021</td>
-          </tr>
-        </tbody>
+        {transactions.map(transaction => (
+          <tbody key={transaction.id}>
+            <tr>
+              <td>{transaction.title}</td>
+              <td className={transaction.type}>
+                {formattedAmount(transaction.amount)}
+              </td>
+              <td>{transaction.category}</td>
+              <td>{formattedDate(transaction.createdAt)}</td>
+            </tr>
+          </tbody>
+        ))}
       </table>
     </S.ContainerTable>
   );

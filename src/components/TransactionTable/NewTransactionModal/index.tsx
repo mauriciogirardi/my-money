@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
 import Modal from 'react-modal';
+import { useTransactions } from 'hooks/TransactionsContext';
 
 import closeImg from 'assets/close.svg';
 import incomeImg from 'assets/income.svg';
@@ -24,8 +25,10 @@ export function NewTransactionModal({
   onRequestClose,
 }: NewTransactionModalProps) {
   const [type, setType] = useState('deposit');
-
   const [values, setValues] = useState(initialValue);
+  const [isValueEmpty, setIsValueEmpty] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { createTransaction } = useTransactions();
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,9 +39,36 @@ export function NewTransactionModal({
     [values],
   );
 
-  const handleCreateNewTransactions = useCallback((e: FormEvent) => {
-    e.preventDefault();
-  }, []);
+  const handleCreateNewTransactions = useCallback(
+    async (e: FormEvent) => {
+      e.preventDefault();
+      try {
+        setLoading(true);
+        const { amount, category, title } = values;
+
+        if (!amount || !category || !title) {
+          return setIsValueEmpty(true);
+        }
+
+        setIsValueEmpty(false);
+
+        await createTransaction({
+          amount,
+          category,
+          title,
+          type,
+        });
+
+        onRequestClose();
+        setValues(initialValue);
+        setType('deposit');
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [type, values, onRequestClose, createTransaction],
+  );
 
   return (
     <Modal
@@ -96,7 +126,10 @@ export function NewTransactionModal({
           onChange={onChange}
         />
 
-        <button type="submit">Cadastrar</button>
+        <button type="submit">
+          {loading ? 'Registrando...' : 'Cadastrar'}
+        </button>
+        {isValueEmpty && <S.Error>*Preencha todos os campos!</S.Error>}
       </S.ContainerForm>
     </Modal>
   );

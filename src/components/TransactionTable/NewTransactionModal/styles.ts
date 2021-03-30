@@ -105,3 +105,10 @@ export const RadioBox = styled.button<RadioBoxProps>`
     height: 20px;
   }
 `;
+
+export const Error = styled.span`
+  color: var(--red);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: block;
+`;
