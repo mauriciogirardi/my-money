@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import CountUp from 'react-countup';
 
 import { useTransactions } from 'hooks/TransactionsContext';
@@ -10,9 +9,21 @@ import * as S from './styles';
 
 export function Summary() {
   const { transactions } = useTransactions();
-  const [total, setTotal] = useState(0);
-  const [deposit, setDeposit] = useState(0);
-  const [withdraw, setWithdraw] = useState(0);
+
+  const summary = transactions.reduce(
+    (acc, transaction) => {
+      if (transaction.type === 'deposit') {
+        acc.deposit += Number(transaction.amount);
+        acc.total += Number(transaction.amount);
+      } else {
+        acc.withdraw += Number(transaction.amount);
+        acc.total -= Number(transaction.amount);
+      }
+
+      return acc;
+    },
+    { deposit: 0, withdraw: 0, total: 0 },
+  );
 
   return (
     <S.ContainerSummary>
@@ -24,7 +35,7 @@ export function Summary() {
 
         <strong>
           <CountUp
-            end={1000}
+            end={summary.deposit}
             prefix="R$  "
             separator="."
             decimal=","
@@ -41,7 +52,7 @@ export function Summary() {
 
         <strong>
           <CountUp
-            end={1000}
+            end={summary.withdraw}
             prefix="- R$  "
             separator="."
             decimal=","
@@ -58,7 +69,7 @@ export function Summary() {
 
         <strong>
           <CountUp
-            end={0}
+            end={summary.total}
             prefix="R$  "
             separator="."
             decimal=","
